@@ -6,7 +6,10 @@ import imutils
 import subprocess
 from gtts import gTTS 
 from pydub import AudioSegment
+from mypackage.speech import Speech
 
+
+from io import BytesIO
 # load the COCO class labels our YOLO model was trained on
 LABELS = open("coco.names").read().strip().split("\n")
 
@@ -99,7 +102,7 @@ while True:
 			# boxes
 				idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
 
-
+				
 				label = f"{LABELS[classID]}"
 				color = colors[classID]
 				cv2.rectangle(frame, (x, y), (x + W, y + H), color, 2)
@@ -142,13 +145,30 @@ while True:
 						
 
 				print(texts)
+
+				def speak(text, language='en'):
+					mp3_fo = BytesIO()
+					tts = gTTS(text, lang=language)
+					tts.write_to_fp(mp3_fo)
+					return mp3_fo
 				
 				if texts:
 					description = ', '.join(texts)
-					tts = gTTS(description, lang='en')
-					tts.save('tts.mp3')
-					tts = AudioSegment.from_mp3("tts.mp3")
-					subprocess.call(["ffplay", "-nodisp", "-autoexit", "tts.mp3"])
+					Speech.speak(description)
+					
+					# mp3_fp = BytesIO()
+					# tts = gTTS(description, lang='en')
+					# tts.write_to_fp(mp3_fp)
+					# tts.save('tts.mp3')
+				# 	tts = AudioSegment.from_mp3("tts.mp3")
+				# 	subprocess.call(["ffplay", "-nodisp", "-autoexit", "tts.mp3"])
+
+			
+
+
+				# my_variable = 'hello' # your real code gets this from the chatbot
+				# tts = gTTS(my_variable, 'en')
+				# tts.write_to_fp(mp3_fp)
 
 			
 	
